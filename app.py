@@ -132,10 +132,7 @@ body {
 }
 
 
-/* ==================================
-   오셀로 판
-   사진처럼 초록색 + 검은 격자
-   ================================== */
+/* 오셀로 판 */
 
 .board-wrapper {
     display: flex;
@@ -163,7 +160,7 @@ body {
 }
 
 
-/* 각각의 칸 */
+/* 칸 */
 
 .cell {
     position: relative;
@@ -242,7 +239,7 @@ body {
 }
 
 
-/* 착수 가능한 위치 */
+/* 착수 위치 */
 
 .hint {
     width: 23%;
@@ -307,6 +304,21 @@ body {
     font-weight: bold;
 }
 
+.result button {
+    background: #168447;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    padding: 13px 30px;
+    font-size: 17px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.result button:hover {
+    background: #0f6937;
+}
+
 </style>
 </head>
 
@@ -315,9 +327,7 @@ body {
 
 <div id="app">
 
-    <!-- =========================
-         시작 화면
-         ========================= -->
+    <!-- 시작 화면 -->
 
     <div id="home">
 
@@ -362,9 +372,7 @@ body {
     </div>
 
 
-    <!-- =========================
-         게임 화면
-         ========================= -->
+    <!-- 게임 화면 -->
 
     <div id="game">
 
@@ -684,7 +692,7 @@ function getScore() {
 
 
 /* =====================================
-   화면에 보드 그리기
+   보드 그리기
    ===================================== */
 
 function renderBoard() {
@@ -708,7 +716,6 @@ function renderBoard() {
 
             const value = board[r][c];
 
-            /* 흑돌 */
 
             if (value === BLACK) {
 
@@ -722,7 +729,6 @@ function renderBoard() {
 
             }
 
-            /* 백돌 */
 
             else if (value === WHITE) {
 
@@ -736,7 +742,6 @@ function renderBoard() {
 
             }
 
-            /* 착수 가능 위치 */
 
             else {
 
@@ -761,8 +766,6 @@ function renderBoard() {
             }
 
 
-            /* 클릭 */
-
             cell.onclick = function() {
 
                 playerClick(r, c);
@@ -775,7 +778,6 @@ function renderBoard() {
         }
 
     }
-
 
     updateScore();
 
@@ -857,15 +859,12 @@ function playerClick(r, c) {
         return;
     }
 
-    /* AI 모드에서 백은 AI */
-
     if (
         gameMode === "ai" &&
         currentPlayer === WHITE
     ) {
         return;
     }
-
 
     const success =
         makeMove(
@@ -877,7 +876,6 @@ function playerClick(r, c) {
     if (!success) {
         return;
     }
-
 
     currentPlayer =
         opponent(currentPlayer);
@@ -903,8 +901,6 @@ function checkTurn() {
         getValidMoves(currentPlayer);
 
 
-    /* 놓을 곳이 없는 경우 */
-
     if (moves.length === 0) {
 
         const otherMoves =
@@ -912,16 +908,12 @@ function checkTurn() {
                 opponent(currentPlayer)
             );
 
-        /* 둘 다 놓을 곳 없음 */
-
         if (otherMoves.length === 0) {
 
             finishGame();
             return;
 
         }
-
-        /* 패스 */
 
         currentPlayer =
             opponent(currentPlayer);
@@ -933,8 +925,6 @@ function checkTurn() {
 
     updateTurnText();
 
-
-    /* AI 차례 */
 
     if (
         gameMode === "ai" &&
@@ -1001,8 +991,6 @@ function aiTurn() {
             ).length;
 
 
-        /* 모서리 */
-
         const isCorner =
             corners.some(
                 corner =>
@@ -1014,8 +1002,6 @@ function aiTurn() {
             score += 1000;
         }
 
-
-        /* 가장자리 */
 
         if (
             r === 0 ||
@@ -1106,7 +1092,14 @@ function finishGame() {
         score.black +
         " : " +
         score.white +
-        " ⚪";
+        " ⚪" +
+        `
+        <br><br>
+
+        <button onclick="goHome()">
+            🔄 다시하기
+        </button>
+        `;
 
 }
 
@@ -1168,6 +1161,16 @@ function goHome() {
     document.getElementById(
         "home"
     ).style.display = "block";
+
+    document.getElementById(
+        "result"
+    ).style.display = "none";
+
+    createBoard();
+
+    currentPlayer = BLACK;
+
+    gameOver = false;
 
 }
 
