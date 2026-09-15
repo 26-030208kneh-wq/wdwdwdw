@@ -51,7 +51,9 @@ body {
 }
 
 
-/* 시작 화면 */
+/* ==============================
+   시작 화면
+   ============================== */
 
 .start-box {
     background: white;
@@ -103,7 +105,9 @@ body {
 }
 
 
-/* 게임 */
+/* ==============================
+   게임
+   ============================== */
 
 #game {
     display: none;
@@ -132,7 +136,9 @@ body {
 }
 
 
-/* 오셀로 판 */
+/* ==============================
+   오셀로 판
+   ============================== */
 
 .board-wrapper {
     display: flex;
@@ -190,7 +196,9 @@ body {
 }
 
 
-/* 돌 */
+/* ==============================
+   돌
+   ============================== */
 
 .stone {
     width: 72%;
@@ -239,7 +247,9 @@ body {
 }
 
 
-/* 착수 위치 */
+/* ==============================
+   착수 위치
+   ============================== */
 
 .hint {
     width: 23%;
@@ -256,7 +266,9 @@ body {
 }
 
 
-/* 버튼 */
+/* ==============================
+   아래 버튼
+   ============================== */
 
 .buttons {
     margin-top: 20px;
@@ -289,30 +301,44 @@ body {
 }
 
 
-/* 결과 */
+/* ==============================
+   게임 종료 결과
+   ============================== */
 
 .result {
-    margin-top: 15px;
+    margin-top: 20px;
 
     background: white;
 
     border-radius: 15px;
 
-    padding: 20px;
+    padding: 25px;
 
     font-size: 23px;
     font-weight: bold;
+
+    box-shadow:
+        0 4px 15px rgba(0,0,0,0.12);
 }
 
 .result button {
     background: #168447;
+
     color: white;
+
     border: none;
+
     border-radius: 10px;
-    padding: 13px 30px;
-    font-size: 17px;
+
+    padding: 14px 35px;
+
+    font-size: 18px;
+
     font-weight: bold;
+
     cursor: pointer;
+
+    margin-top: 10px;
 }
 
 .result button:hover {
@@ -327,7 +353,10 @@ body {
 
 <div id="app">
 
-    <!-- 시작 화면 -->
+
+    <!-- ==================================
+         메인 화면
+         ================================== -->
 
     <div id="home">
 
@@ -338,6 +367,7 @@ body {
         <div class="subtitle">
             상대방의 돌을 사이에 끼워 뒤집어 보세요!
         </div>
+
 
         <div class="start-box">
 
@@ -353,12 +383,14 @@ body {
                 게임 방식을 선택해주세요.
             </div>
 
+
             <button
                 class="start-button ai-button"
                 onclick="startGame('ai')"
             >
                 🤖 AI와 하기
             </button>
+
 
             <button
                 class="start-button friend-button"
@@ -372,13 +404,16 @@ body {
     </div>
 
 
-    <!-- 게임 화면 -->
+    <!-- ==================================
+         게임 화면
+         ================================== -->
 
     <div id="game">
 
         <div class="title">
             ⚫ 오셀로 ⚪
         </div>
+
 
         <div class="game-header">
 
@@ -393,6 +428,7 @@ body {
                 </div>
 
             </div>
+
 
             <div
                 class="turn"
@@ -417,7 +453,9 @@ body {
         </div>
 
 
-        <!-- 결과 -->
+        <!-- ==================================
+             게임 결과
+             ================================== -->
 
         <div
             id="result"
@@ -427,7 +465,9 @@ body {
         </div>
 
 
-        <!-- 버튼 -->
+        <!-- ==================================
+             게임 중 버튼
+             ================================== -->
 
         <div class="buttons">
 
@@ -437,6 +477,7 @@ body {
             >
                 🔄 다시 시작
             </button>
+
 
             <button
                 class="game-button home"
@@ -455,7 +496,7 @@ body {
 <script>
 
 /* =====================================
-   오셀로 게임
+   기본 설정
    ===================================== */
 
 const EMPTY = 0;
@@ -463,12 +504,17 @@ const BLACK = 1;
 const WHITE = 2;
 
 let board = [];
+
 let currentPlayer = BLACK;
+
 let gameMode = "ai";
+
 let gameOver = false;
 
 
-/* 방향 */
+/* =====================================
+   방향
+   ===================================== */
 
 const directions = [
 
@@ -487,7 +533,7 @@ const directions = [
 
 
 /* =====================================
-   새 보드
+   보드 생성
    ===================================== */
 
 function createBoard() {
@@ -499,10 +545,13 @@ function createBoard() {
         board[r] = [];
 
         for (let c = 0; c < 8; c++) {
+
             board[r][c] = EMPTY;
+
         }
 
     }
+
 
     board[3][3] = WHITE;
     board[3][4] = BLACK;
@@ -528,7 +577,7 @@ function opponent(player) {
 
 
 /* =====================================
-   보드 안인지
+   보드 안인지 확인
    ===================================== */
 
 function inside(r, c) {
@@ -553,13 +602,18 @@ function getFlips(r, c, player) {
         return [];
     }
 
+
     if (board[r][c] !== EMPTY) {
         return [];
     }
 
-    const enemy = opponent(player);
+
+    const enemy =
+        opponent(player);
+
 
     let flips = [];
+
 
     for (const direction of directions) {
 
@@ -570,6 +624,7 @@ function getFlips(r, c, player) {
         let cc = c + dc;
 
         let temp = [];
+
 
         while (
             inside(rr, cc) &&
@@ -583,17 +638,20 @@ function getFlips(r, c, player) {
 
         }
 
+
         if (
             temp.length > 0 &&
             inside(rr, cc) &&
             board[rr][cc] === player
         ) {
 
-            flips = flips.concat(temp);
+            flips =
+                flips.concat(temp);
 
         }
 
     }
+
 
     return flips;
 
@@ -601,19 +659,24 @@ function getFlips(r, c, player) {
 
 
 /* =====================================
-   가능한 위치
+   가능한 착수
    ===================================== */
 
 function getValidMoves(player) {
 
     let moves = [];
 
+
     for (let r = 0; r < 8; r++) {
 
         for (let c = 0; c < 8; c++) {
 
             if (
-                getFlips(r, c, player).length > 0
+                getFlips(
+                    r,
+                    c,
+                    player
+                ).length > 0
             ) {
 
                 moves.push([r, c]);
@@ -623,6 +686,7 @@ function getValidMoves(player) {
         }
 
     }
+
 
     return moves;
 
@@ -635,23 +699,34 @@ function getValidMoves(player) {
 
 function makeMove(r, c, player) {
 
-    const flips = getFlips(
-        r,
-        c,
-        player
-    );
+    const flips =
+        getFlips(
+            r,
+            c,
+            player
+        );
+
 
     if (flips.length === 0) {
+
         return false;
+
     }
+
 
     board[r][c] = player;
 
+
     for (const position of flips) {
 
-        board[position[0]][position[1]] = player;
+        board[
+            position[0]
+        ][
+            position[1]
+        ] = player;
 
     }
+
 
     return true;
 
@@ -659,29 +734,41 @@ function makeMove(r, c, player) {
 
 
 /* =====================================
-   점수
+   점수 계산
    ===================================== */
 
 function getScore() {
 
     let black = 0;
+
     let white = 0;
+
 
     for (let r = 0; r < 8; r++) {
 
         for (let c = 0; c < 8; c++) {
 
-            if (board[r][c] === BLACK) {
+            if (
+                board[r][c] === BLACK
+            ) {
+
                 black++;
+
             }
 
-            if (board[r][c] === WHITE) {
+
+            if (
+                board[r][c] === WHITE
+            ) {
+
                 white++;
+
             }
 
         }
 
     }
+
 
     return {
         black: black,
@@ -692,35 +779,51 @@ function getScore() {
 
 
 /* =====================================
-   보드 그리기
+   보드 화면 그리기
    ===================================== */
 
 function renderBoard() {
 
     const boardElement =
-        document.getElementById("board");
+        document.getElementById(
+            "board"
+        );
+
 
     boardElement.innerHTML = "";
 
+
     const moves =
-        getValidMoves(currentPlayer);
+        getValidMoves(
+            currentPlayer
+        );
+
 
     for (let r = 0; r < 8; r++) {
 
         for (let c = 0; c < 8; c++) {
 
             const cell =
-                document.createElement("div");
+                document.createElement(
+                    "div"
+                );
+
 
             cell.className = "cell";
 
-            const value = board[r][c];
 
+            const value =
+                board[r][c];
+
+
+            /* 흑돌 */
 
             if (value === BLACK) {
 
                 const stone =
-                    document.createElement("div");
+                    document.createElement(
+                        "div"
+                    );
 
                 stone.className =
                     "stone black";
@@ -730,10 +833,14 @@ function renderBoard() {
             }
 
 
+            /* 백돌 */
+
             else if (value === WHITE) {
 
                 const stone =
-                    document.createElement("div");
+                    document.createElement(
+                        "div"
+                    );
 
                 stone.className =
                     "stone white";
@@ -742,6 +849,8 @@ function renderBoard() {
 
             }
 
+
+            /* 빈칸 */
 
             else {
 
@@ -752,32 +861,46 @@ function renderBoard() {
                             move[1] === c
                     );
 
+
                 if (canMove) {
 
                     const hint =
-                        document.createElement("div");
+                        document.createElement(
+                            "div"
+                        );
 
-                    hint.className = "hint";
+                    hint.className =
+                        "hint";
 
-                    cell.appendChild(hint);
+                    cell.appendChild(
+                        hint
+                    );
 
                 }
 
             }
 
 
+            /* 클릭 */
+
             cell.onclick = function() {
 
-                playerClick(r, c);
+                playerClick(
+                    r,
+                    c
+                );
 
             };
 
 
-            boardElement.appendChild(cell);
+            boardElement.appendChild(
+                cell
+            );
 
         }
 
     }
+
 
     updateScore();
 
@@ -790,15 +913,20 @@ function renderBoard() {
 
 function updateScore() {
 
-    const score = getScore();
+    const score =
+        getScore();
+
 
     document.getElementById(
         "blackScore"
-    ).textContent = score.black;
+    ).textContent =
+        score.black;
+
 
     document.getElementById(
         "whiteScore"
-    ).textContent = score.white;
+    ).textContent =
+        score.white;
 
 }
 
@@ -810,11 +938,17 @@ function updateScore() {
 function updateTurnText() {
 
     const text =
-        document.getElementById("turnText");
+        document.getElementById(
+            "turnText"
+        );
+
 
     if (gameOver) {
+
         return;
+
     }
+
 
     if (gameMode === "ai") {
 
@@ -823,21 +957,27 @@ function updateTurnText() {
             text.textContent =
                 "⚫ 당신의 차례입니다.";
 
-        } else {
+        }
+
+        else {
 
             text.textContent =
                 "🤖 AI가 생각하고 있습니다...";
 
         }
 
-    } else {
+    }
+
+    else {
 
         if (currentPlayer === BLACK) {
 
             text.textContent =
                 "⚫ 흑돌의 차례입니다.";
 
-        } else {
+        }
+
+        else {
 
             text.textContent =
                 "⚪ 백돌의 차례입니다.";
@@ -850,21 +990,29 @@ function updateTurnText() {
 
 
 /* =====================================
-   사람 클릭
+   사람의 착수
    ===================================== */
 
 function playerClick(r, c) {
 
     if (gameOver) {
+
         return;
+
     }
+
+
+    /* AI가 백돌 */
 
     if (
         gameMode === "ai" &&
         currentPlayer === WHITE
     ) {
+
         return;
+
     }
+
 
     const success =
         makeMove(
@@ -873,12 +1021,19 @@ function playerClick(r, c) {
             currentPlayer
         );
 
+
     if (!success) {
+
         return;
+
     }
 
+
     currentPlayer =
-        opponent(currentPlayer);
+        opponent(
+            currentPlayer
+        );
+
 
     renderBoard();
 
@@ -894,29 +1049,50 @@ function playerClick(r, c) {
 function checkTurn() {
 
     if (gameOver) {
+
         return;
+
     }
 
-    let moves =
-        getValidMoves(currentPlayer);
 
+    const moves =
+        getValidMoves(
+            currentPlayer
+        );
+
+
+    /* 놓을 곳이 없음 */
 
     if (moves.length === 0) {
 
         const otherMoves =
             getValidMoves(
-                opponent(currentPlayer)
+                opponent(
+                    currentPlayer
+                )
             );
 
-        if (otherMoves.length === 0) {
+
+        /* 양쪽 모두 놓을 곳 없음 */
+
+        if (
+            otherMoves.length === 0
+        ) {
 
             finishGame();
+
             return;
 
         }
 
+
+        /* 패스 */
+
         currentPlayer =
-            opponent(currentPlayer);
+            opponent(
+                currentPlayer
+            );
+
 
         renderBoard();
 
@@ -926,6 +1102,8 @@ function checkTurn() {
     updateTurnText();
 
 
+    /* AI 차례 */
+
     if (
         gameMode === "ai" &&
         currentPlayer === WHITE
@@ -933,7 +1111,7 @@ function checkTurn() {
 
         setTimeout(
             aiTurn,
-            600
+            700
         );
 
     }
@@ -948,11 +1126,17 @@ function checkTurn() {
 function aiTurn() {
 
     if (gameOver) {
+
         return;
+
     }
 
+
     const moves =
-        getValidMoves(WHITE);
+        getValidMoves(
+            WHITE
+        );
+
 
     if (moves.length === 0) {
 
@@ -961,6 +1145,7 @@ function aiTurn() {
         checkTurn();
 
         return;
+
     }
 
 
@@ -975,13 +1160,16 @@ function aiTurn() {
 
 
     let bestMove = null;
+
     let bestScore = -999999;
 
 
     for (const move of moves) {
 
         const r = move[0];
+
         const c = move[1];
+
 
         let score =
             getFlips(
@@ -991,6 +1179,8 @@ function aiTurn() {
             ).length;
 
 
+        /* 모서리 */
+
         const isCorner =
             corners.some(
                 corner =>
@@ -998,10 +1188,15 @@ function aiTurn() {
                     corner[1] === c
             );
 
+
         if (isCorner) {
+
             score += 1000;
+
         }
 
+
+        /* 가장자리 */
 
         if (
             r === 0 ||
@@ -1018,6 +1213,7 @@ function aiTurn() {
         if (score > bestScore) {
 
             bestScore = score;
+
             bestMove = move;
 
         }
@@ -1025,14 +1221,19 @@ function aiTurn() {
     }
 
 
-    makeMove(
-        bestMove[0],
-        bestMove[1],
-        WHITE
-    );
+    if (bestMove) {
+
+        makeMove(
+            bestMove[0],
+            bestMove[1],
+            WHITE
+        );
+
+    }
 
 
     currentPlayer = BLACK;
+
 
     renderBoard();
 
@@ -1049,57 +1250,112 @@ function finishGame() {
 
     gameOver = true;
 
-    const score = getScore();
+
+    const score =
+        getScore();
+
 
     let message = "";
 
-    if (score.black > score.white) {
+
+    if (
+        score.black > score.white
+    ) {
 
         if (gameMode === "ai") {
-            message = "🎉 당신의 승리!";
-        } else {
-            message = "🎉 흑돌 승리!";
+
+            message =
+                "🎉 당신의 승리!";
+
+        }
+
+        else {
+
+            message =
+                "🎉 흑돌 승리!";
+
         }
 
     }
 
-    else if (score.white > score.black) {
+
+    else if (
+        score.white > score.black
+    ) {
 
         if (gameMode === "ai") {
-            message = "🤖 AI의 승리!";
-        } else {
-            message = "🎉 백돌 승리!";
+
+            message =
+                "🤖 AI의 승리!";
+
+        }
+
+        else {
+
+            message =
+                "🎉 백돌 승리!";
+
         }
 
     }
+
 
     else {
 
-        message = "🤝 무승부!";
+        message =
+            "🤝 무승부!";
 
     }
 
 
     const result =
-        document.getElementById("result");
+        document.getElementById(
+            "result"
+        );
 
-    result.style.display = "block";
+
+    result.style.display =
+        "block";
+
 
     result.innerHTML =
-        message +
-        "<br><br>" +
-        "⚫ " +
-        score.black +
-        " : " +
-        score.white +
-        " ⚪" +
-        `
-        <br><br>
 
-        <button onclick="goHome()">
-            🔄 다시하기
-        </button>
-        `;
+        message +
+
+        "<br><br>" +
+
+        "⚫ " +
+
+        score.black +
+
+        " : " +
+
+        score.white +
+
+        " ⚪" +
+
+        "<br><br>" +
+
+        '<button onclick="goHome()">' +
+
+        "🔄 다시하기" +
+
+        "</button>";
+
+
+    /* 결과가 보이도록 자동 스크롤 */
+
+    setTimeout(
+        function() {
+
+            result.scrollIntoView({
+                behavior: "smooth",
+                block: "center"
+            });
+
+        },
+        100
+    );
 
 }
 
@@ -1112,13 +1368,18 @@ function startGame(mode) {
 
     gameMode = mode;
 
+
     document.getElementById(
         "home"
-    ).style.display = "none";
+    ).style.display =
+        "none";
+
 
     document.getElementById(
         "game"
-    ).style.display = "block";
+    ).style.display =
+        "block";
+
 
     restartGame();
 
@@ -1126,22 +1387,29 @@ function startGame(mode) {
 
 
 /* =====================================
-   다시 시작
+   게임 다시 시작
    ===================================== */
 
 function restartGame() {
 
     createBoard();
 
-    currentPlayer = BLACK;
+
+    currentPlayer =
+        BLACK;
+
 
     gameOver = false;
 
+
     document.getElementById(
         "result"
-    ).style.display = "none";
+    ).style.display =
+        "none";
+
 
     renderBoard();
+
 
     updateTurnText();
 
@@ -1149,26 +1417,35 @@ function restartGame() {
 
 
 /* =====================================
-   처음으로
+   메인 화면으로
    ===================================== */
 
 function goHome() {
 
     document.getElementById(
         "game"
-    ).style.display = "none";
+    ).style.display =
+        "none";
+
 
     document.getElementById(
         "home"
-    ).style.display = "block";
+    ).style.display =
+        "block";
+
 
     document.getElementById(
         "result"
-    ).style.display = "none";
+    ).style.display =
+        "none";
+
 
     createBoard();
 
-    currentPlayer = BLACK;
+
+    currentPlayer =
+        BLACK;
+
 
     gameOver = false;
 
@@ -1179,6 +1456,6 @@ function goHome() {
 </body>
 </html>
 """,
-    height=850,
-    scrolling=False
+    height=1100,
+    scrolling=True
 )
