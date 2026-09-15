@@ -2,11 +2,11 @@ import streamlit as st
 import random
 
 # ==========================================
-# 기본 설정
+# 설정
 # ==========================================
 
 st.set_page_config(
-    page_title="오셀로 게임",
+    page_title="오셀로",
     page_icon="⚫",
     layout="centered"
 )
@@ -23,7 +23,7 @@ DIRECTIONS = [
 
 
 # ==========================================
-# 게임 함수
+# 보드 만들기
 # ==========================================
 
 def create_board():
@@ -37,13 +37,27 @@ def create_board():
     return board
 
 
-def opponent(player):
-    return WHITE if player == BLACK else BLACK
+# ==========================================
+# 상대 돌
+# ==========================================
 
+def opponent(player):
+    if player == BLACK:
+        return WHITE
+    return BLACK
+
+
+# ==========================================
+# 보드 안인지 확인
+# ==========================================
 
 def inside(row, col):
     return 0 <= row < 8 and 0 <= col < 8
 
+
+# ==========================================
+# 뒤집을 돌 찾기
+# ==========================================
 
 def get_flips(board, row, col, player):
 
@@ -79,6 +93,10 @@ def get_flips(board, row, col, player):
     return flips
 
 
+# ==========================================
+# 놓을 수 있는 위치
+# ==========================================
+
 def valid_moves(board, player):
 
     moves = []
@@ -92,9 +110,18 @@ def valid_moves(board, player):
     return moves
 
 
+# ==========================================
+# 돌 놓기
+# ==========================================
+
 def make_move(board, row, col, player):
 
-    flips = get_flips(board, row, col, player)
+    flips = get_flips(
+        board,
+        row,
+        col,
+        player
+    )
 
     if not flips:
         return False
@@ -106,6 +133,10 @@ def make_move(board, row, col, player):
 
     return True
 
+
+# ==========================================
+# 점수 계산
+# ==========================================
 
 def count_stones(board):
 
@@ -125,12 +156,13 @@ def count_stones(board):
 
 def ai_move(board):
 
-    moves = valid_moves(board, WHITE)
+    moves = valid_moves(
+        board,
+        WHITE
+    )
 
     if not moves:
         return None
-
-    candidates = []
 
     corners = [
         (0, 0),
@@ -139,11 +171,13 @@ def ai_move(board):
         (7, 7)
     ]
 
+    candidates = []
+
     for move in moves:
 
         row, col = move
 
-        flip_count = len(
+        score = len(
             get_flips(
                 board,
                 row,
@@ -152,14 +186,15 @@ def ai_move(board):
             )
         )
 
-        score = flip_count
-
-        # 모서리 매우 중요
+        # 모서리는 매우 좋은 위치
         if move in corners:
             score += 1000
 
-        # 가장자리도 약간 유리
-        if row in [0, 7] or col in [0, 7]:
+        # 가장자리 보너스
+        if row == 0 or row == 7:
+            score += 20
+
+        if col == 0 or col == 7:
             score += 20
 
         candidates.append(
@@ -167,7 +202,8 @@ def ai_move(board):
         )
 
     best_score = max(
-        score for move, score in candidates
+        score
+        for move, score in candidates
     )
 
     best_moves = [
@@ -180,7 +216,7 @@ def ai_move(board):
 
 
 # ==========================================
-# 게임 초기화
+# 게임 시작
 # ==========================================
 
 def start_game(mode):
@@ -190,11 +226,13 @@ def start_game(mode):
     st.session_state.board = create_board()
     st.session_state.turn = BLACK
     st.session_state.game_over = False
-    st.session_state.message = "⚫ 흑돌의 차례입니다."
 
+
+# ==========================================
+# 처음 화면으로
+# ==========================================
 
 def go_home():
-
     st.session_state.screen = "home"
 
 
@@ -207,7 +245,7 @@ if "screen" not in st.session_state:
 
 
 # ==========================================
-# CSS
+# 디자인
 # ==========================================
 
 st.markdown(
@@ -215,80 +253,70 @@ st.markdown(
     <style>
 
     .stApp {
-        background-color: #f5f7f6;
+        background-color: #f3f6f4;
     }
 
     .title {
         text-align: center;
-        font-size: 48px;
-        font-weight: 800;
         color: #173d2b;
-        margin-bottom: 5px;
+        font-size: 50px;
+        font-weight: 800;
+        margin-top: 20px;
     }
 
     .subtitle {
         text-align: center;
         color: #66756d;
         font-size: 18px;
-        margin-bottom: 35px;
+        margin-bottom: 30px;
     }
 
     .game-title {
         text-align: center;
-        font-size: 38px;
-        font-weight: 800;
         color: #173d2b;
+        font-size: 40px;
+        font-weight: 800;
     }
 
-    .score {
-        text-align: center;
-        font-size: 22px;
-        font-weight: 700;
-        margin: 15px;
-    }
+    .board {
+        width: min(92vw, 600px);
+        height: min(92vw, 600px);
 
-    .board-wrapper {
-        display: flex;
-        justify-content: center;
-        margin-top: 20px;
-        margin-bottom: 20px;
-    }
-
-    .othello-board {
-        width: min(88vw, 600px);
-        height: min(88vw, 600px);
+        margin: 20px auto;
 
         background-color: #168447;
 
-        border: 8px solid #0b542d;
+        border: 8px solid #084d29;
 
-        border-radius: 8px;
+        border-radius: 10px;
 
         padding: 3px;
 
         display: grid;
+
         grid-template-columns: repeat(8, 1fr);
         grid-template-rows: repeat(8, 1fr);
 
         gap: 2px;
 
         box-shadow:
-            0 8px 20px rgba(0,0,0,0.2);
+            0 8px 20px rgba(0,0,0,0.25);
     }
 
     .cell {
-        background-color: #1c9a50;
+        background-color: #1c9950;
 
         display: flex;
+
         align-items: center;
         justify-content: center;
 
-        border: 1px solid #116f3b;
+        border: 1px solid #11723b;
     }
 
-    .black {
-        width: 78%;
-        height: 78%;
+    .black-stone {
+        width: 75%;
+        height: 75%;
 
         border-radius: 50%;
 
@@ -296,17 +324,17 @@ st.markdown(
             radial-gradient(
                 circle at 30% 25%,
                 #555,
-                #111 55%,
+                #222 50%,
                 #000
             );
 
         box-shadow:
-            2px 3px 5px rgba(0,0,0,0.45);
+            2px 4px 6px rgba(0,0,0,0.5);
     }
 
-    .white {
-        width: 78%;
-        height: 78%;
+    .white-stone {
+        width: 75%;
+        height: 75%;
 
         border-radius: 50%;
 
@@ -314,12 +342,12 @@ st.markdown(
             radial-gradient(
                 circle at 30% 25%,
                 #ffffff,
-                #eeeeee 60%,
+                #eeeeee 55%,
                 #bbbbbb
             );
 
         box-shadow:
-            2px 3px 5px rgba(0,0,0,0.45);
+            2px 4px 6px rgba(0,0,0,0.4);
     }
 
     .hint {
@@ -328,10 +356,10 @@ st.markdown(
 
         border-radius: 50%;
 
-        background-color: #f7d94c;
+        background-color: #f6d743;
 
         box-shadow:
-            0 0 8px rgba(255,255,0,0.8);
+            0 0 8px #fff000;
     }
 
     </style>
@@ -347,33 +375,43 @@ st.markdown(
 if st.session_state.screen == "home":
 
     st.markdown(
-        '<div class="title">⚫ 오셀로</div>',
-        unsafe_allow_html=True
-    )
+        """
+        <div class="title">
+            ⚫ 오셀로 ⚪
+        </div>
 
-    st.markdown(
-        '<div class="subtitle">돌을 놓고 상대의 돌을 뒤집어 보세요!</div>',
+        <div class="subtitle">
+            돌을 놓고 상대의 돌을 뒤집어 보세요!
+        </div>
+        """,
         unsafe_allow_html=True
     )
 
     st.markdown(
         """
         <div style="
-            background:#ffffff;
-            padding:35px;
+            background:white;
+            padding:30px;
             border-radius:20px;
             text-align:center;
             box-shadow:0 5px 20px rgba(0,0,0,0.08);
         ">
-            <div style="font-size:80px;">
+
+            <div style="
+                font-size:70px;
+                margin-bottom:10px;
+            ">
                 ⚫ ⚪
             </div>
 
-            <h2>게임을 시작하세요</h2>
+            <h2 style="color:#173d2b;">
+                게임을 시작하세요
+            </h2>
 
             <p style="color:#777;">
-                원하는 게임 방식을 선택할 수 있습니다.
+                게임 방식을 선택하세요.
             </p>
+
         </div>
         """,
         unsafe_allow_html=True
@@ -387,7 +425,8 @@ if st.session_state.screen == "home":
 
         if st.button(
             "🤖 AI와 하기",
-            use_container_width=True
+            use_container_width=True,
+            type="primary"
         ):
             start_game("ai")
             st.rerun()
@@ -396,7 +435,8 @@ if st.session_state.screen == "home":
 
         if st.button(
             "👥 친구와 하기",
-            use_container_width=True
+            use_container_width=True,
+            type="primary"
         ):
             start_game("friend")
             st.rerun()
@@ -405,7 +445,7 @@ if st.session_state.screen == "home":
 
     st.info(
         "⚫ 흑돌이 먼저 시작합니다. "
-        "노란 점이 있는 위치에 돌을 놓을 수 있습니다."
+        "노란색 점이 있는 곳에 돌을 놓을 수 있습니다."
     )
 
 
@@ -422,46 +462,51 @@ else:
     black, white = count_stones(board)
 
     st.markdown(
-        '<div class="game-title">⚫ 오셀로</div>',
+        '<div class="game-title">⚫ 오셀로 ⚪</div>',
         unsafe_allow_html=True
     )
 
     # 점수
-    st.markdown(
-        f"""
-        <div class="score">
-            ⚫ {black}
-            &nbsp;&nbsp;&nbsp;
-            :
-            &nbsp;&nbsp;&nbsp;
-            {white} ⚪
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
+    col1, col2, col3 = st.columns(3)
+
+    with col1:
+        st.metric("⚫ 흑", black)
+
+    with col2:
+
+        if turn == BLACK:
+            st.metric("현재 차례", "⚫ 흑")
+        else:
+            st.metric("현재 차례", "⚪ 백")
+
+    with col3:
+        st.metric("⚪ 백", white)
 
     # 게임 방식
     if mode == "ai":
-        mode_text = "🤖 AI와 대결"
+        st.caption("🤖 AI와 하기")
     else:
-        mode_text = "👥 친구와 대결"
+        st.caption("👥 친구와 하기")
 
-    st.caption(
-        f"게임 방식: {mode_text}"
+    # ======================================
+    # 게임 종료 확인
+    # ======================================
+
+    black_moves = valid_moves(
+        board,
+        BLACK
     )
 
-    # ======================================
-    # 게임 종료
-    # ======================================
+    white_moves = valid_moves(
+        board,
+        WHITE
+    )
 
-    if (
-        len(valid_moves(board, BLACK)) == 0
-        and len(valid_moves(board, WHITE)) == 0
-    ):
+    if not black_moves and not white_moves:
         st.session_state.game_over = True
 
     # ======================================
-    # 게임 종료 화면
+    # 게임 종료
     # ======================================
 
     if st.session_state.game_over:
@@ -474,7 +519,7 @@ else:
             result = "🤝 무승부!"
 
         st.success(
-            f"{result}   최종 점수: ⚫ {black} : {white} ⚪"
+            f"{result}  최종 점수: ⚫ {black} : {white} ⚪"
         )
 
         col1, col2 = st.columns(2)
@@ -503,7 +548,12 @@ else:
 
     elif mode == "ai" and turn == WHITE:
 
-        moves = valid_moves(board, WHITE)
+        st.info("🤖 AI가 생각하고 있습니다...")
+
+        moves = valid_moves(
+            board,
+            WHITE
+        )
 
         if moves:
 
@@ -518,20 +568,13 @@ else:
                     WHITE
                 )
 
-                st.session_state.turn = BLACK
-                st.session_state.message = (
-                    "⚫ 당신의 차례입니다."
-                )
+            st.session_state.turn = BLACK
 
-                st.rerun()
+            st.rerun()
 
         else:
 
             st.session_state.turn = BLACK
-            st.session_state.message = (
-                "🤖 AI가 놓을 곳이 없습니다. "
-                "당신의 차례입니다."
-            )
 
             st.rerun()
 
@@ -541,43 +584,39 @@ else:
 
     else:
 
-        moves = valid_moves(board, turn)
-
-        if turn == BLACK:
-
-            player_name = "⚫ 흑돌"
-
-        else:
-
-            player_name = "⚪ 백돌"
-
-        st.info(
-            f"{player_name}의 차례입니다."
+        moves = valid_moves(
+            board,
+            turn
         )
 
         # 놓을 곳이 없는 경우
         if not moves:
 
-            st.warning(
-                f"{player_name}은 놓을 수 있는 곳이 없습니다. "
-                "자동으로 차례가 넘어갑니다."
-            )
+            if turn == BLACK:
+                st.warning(
+                    "⚫ 흑돌은 놓을 수 있는 곳이 없습니다."
+                )
+            else:
+                st.warning(
+                    "⚪ 백돌은 놓을 수 있는 곳이 없습니다."
+                )
 
             st.session_state.turn = opponent(turn)
 
             st.rerun()
 
+        # 현재 차례
+        if turn == BLACK:
+            st.info("⚫ 흑돌의 차례입니다.")
+        else:
+            st.info("⚪ 백돌의 차례입니다.")
+
         # ==================================
-        # 보드
+        # 초록색 오셀로 판
         # ==================================
 
         st.markdown(
-            '<div class="board-wrapper">',
-            unsafe_allow_html=True
-        )
-
-        st.markdown(
-            '<div class="othello-board">',
+            '<div class="board">',
             unsafe_allow_html=True
         )
 
@@ -593,14 +632,14 @@ else:
                 if board[row][col] == BLACK:
 
                     st.markdown(
-                        '<div class="black"></div>',
+                        '<div class="black-stone"></div>',
                         unsafe_allow_html=True
                     )
 
                 elif board[row][col] == WHITE:
 
                     st.markdown(
-                        '<div class="white"></div>',
+                        '<div class="white-stone"></div>',
                         unsafe_allow_html=True
                     )
 
@@ -617,16 +656,16 @@ else:
                 )
 
         st.markdown(
-            '</div></div>',
+            '</div>',
             unsafe_allow_html=True
         )
 
         # ==================================
-        # 실제 클릭 버튼
+        # 착수 버튼
         # ==================================
 
         st.markdown(
-            "### 착수할 위치를 선택하세요"
+            "### 🟡 놓을 위치를 선택하세요"
         )
 
         for row in range(8):
@@ -638,29 +677,21 @@ else:
                 with cols[col]:
 
                     if board[row][col] == BLACK:
-
                         label = "⚫"
 
                     elif board[row][col] == WHITE:
-
                         label = "⚪"
 
                     elif (row, col) in moves:
-
                         label = "🟡"
 
                     else:
-
-                        label = " "
-
-                    can_click = (
-                        (row, col) in moves
-                    )
+                        label = "·"
 
                     if st.button(
                         label,
-                        key=f"move_{row}_{col}",
-                        disabled=not can_click,
+                        key=f"cell_{row}_{col}",
+                        disabled=(row, col) not in moves,
                         use_container_width=True
                     ):
 
@@ -689,16 +720,14 @@ else:
             "🔄 게임 다시 시작",
             use_container_width=True
         ):
-
             start_game(mode)
             st.rerun()
 
     with col2:
 
         if st.button(
-            "🏠 게임 선택으로",
+            "🏠 처음으로",
             use_container_width=True
         ):
-
             go_home()
             st.rerun()
